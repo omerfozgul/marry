@@ -49,24 +49,34 @@ function updateCountdown() {
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
     
     // DOM elementlerini güncelle
-    document.getElementById('days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    
+    if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
     
     // Eğer tarih geçtiyse
     if (distance < 0) {
-        document.getElementById('days').textContent = '00';
-        document.getElementById('hours').textContent = '00';
-        document.getElementById('minutes').textContent = '00';
-        document.getElementById('seconds').textContent = '00';
+        if (daysEl) daysEl.textContent = '00';
+        if (hoursEl) hoursEl.textContent = '00';
+        if (minutesEl) minutesEl.textContent = '00';
+        if (secondsEl) secondsEl.textContent = '00';
         
         const messageEl = document.getElementById('message');
-        messageEl.innerHTML = '<p>🎉 Elhamdülillah! Rabbim saadeti dareyn nasip etsin! 🎉</p>';
-        messageEl.classList.add('show');
+        if (messageEl) {
+            messageEl.innerHTML = '<p>🎉 Elhamdülillah! Rabbim saadeti dareyn nasip etsin! 🎉</p>';
+            messageEl.classList.add('show');
+        }
         
         // Kutlama animasyonu ekle
-        document.querySelector('.container').classList.add('celebration');
+        const container = document.querySelector('.container');
+        if (container) {
+            container.classList.add('celebration');
+        }
         
         // Kutlama konfetisi
         createSimpleConfetti();
@@ -120,15 +130,24 @@ function getSpecialMessage(days) {
 function initializeMusic() {
     backgroundMusic = document.getElementById('backgroundMusic');
     
+    if (!backgroundMusic) {
+        console.log('Müzik elementi bulunamadı');
+        return;
+    }
+    
     // Kullanıcı etkileşimi sonrası müziği başlat
-    document.addEventListener('click', function startMusic() {
+    const startMusic = function() {
         if (backgroundMusic && backgroundMusic.paused) {
             backgroundMusic.play().catch(e => {
                 console.log('Müzik çalanamadı:', e);
             });
         }
         document.removeEventListener('click', startMusic);
-    }, { once: true });
+        document.removeEventListener('keydown', startMusic);
+    };
+    
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('keydown', startMusic, { once: true });
 }
 
 // Rastgele romantik söz seç ve göster
@@ -147,9 +166,11 @@ function updateSpecialMessage() {
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     
     const messageEl = document.getElementById('message');
+    if (!messageEl) return;
+    
     const specialMessage = getSpecialMessage(days);
     
-    if (distance > 0 && messageEl) {
+    if (distance > 0) {
         messageEl.innerHTML = `<p>${specialMessage}</p>`;
         messageEl.classList.add('show');
     }
